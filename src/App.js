@@ -1,43 +1,63 @@
 import React from "react";
-import PropTypes from "prop-types";
+import axios from "axios";
+import Movie from "./Movie";
 
 //class component: has to extend from react component and use render method to show up on screen
 //state: object. dynamic data of component
 //this.add()가 아닌 이유: ()는 즉시 발동, add만 해야 click할 때만
 
 //setState(): refresh state and rerender
-//Mounting
-class App extends React.Component{
-  constructor(props){
-    super(props);
-    console.log("mount");
-  }
+//compoentDidMount에서 data fetching - use axios!
+class App extends React.Component {
   state = {
-    count: 0
+    isLoading: true,
+    movies: []
   };
-  add = () => {
-    this.setState(current => ({count: current.count +1 }));
+  getMovies = async () => {
+    const {
+      data: {
+        data: {
+          movies
+        }
+      }
+    } = await axios.get("https://yts-proxy.nomadcoders1.now.sh/list_movies.json?sort_by=rating");
+    this.setState({movies, isLoading: false});
   };
-  minus = () => {
-    this.setState(current => ({count: current.count -1 }));
-  };
-
-  componentDidMount(){
-    console.log("component rendered");
+  componentDidMount() {
+    this.getMovies();
   }
-  componentDidUpdate(){
-    console.log("I just updated");
-  }
-  render(){
-    console.log("I am rendering");
-    return (
-      <div>
-        <h1>The number is: {this.state.count}</h1>
-        <button onClick={this.add}>Add</button>
-        <button onClick={this.minus}>Minus</button>
-      </div>
-    );
-  }
+  render() {
+    const {isLoading, movies} = this.state;
+    return (< section class = "container" > {
+      isLoading
+        ? (< div clas = "loader" > <span class = "loader_text" > Loading ... < /span> <
+                    /div >)
+        : (< div class = "movies" > {
+          movies.map(movie => { < Movie
+            key = {
+              movie.id
+            }
+            id = {
+              movie.id
+            }
+            year = {
+              movie.year
+            }
+            title = {
+              movie.title
+            }
+            summary = {
+              movie.summary
+            }
+            poster = {
+              movie.medium_cover_image
+            }
+            />;
+                        })
+                    } <
+                    /div >)} < /section>
+        );
+    }
 }
 
 export default App;
